@@ -1,0 +1,175 @@
+ # Copyright (c) 2023 salesforce.com inc.
+ # All rights reserved.
+ # SPDX-License-Identifier: BSD-3-Clause
+ # For full license text see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+
+model:
+  arch: blip2_vicuna_xinstruct
+  model_type: vicuna7b
+  llm_model: meta-llama/Llama-3.2-1B-Instruct
+  load_pretrained: False
+  pretrained: Null
+  load_finetuned: False
+  finetuned: ""
+  stage1_url_or_filename: Null
+  image_model: "eva_clip_g"
+  # pc_model: "ulip2_pointbert"
+  video_model: "eva_clip_g"
+  audio_model: "beats"
+  pretrained_image_qformer: Null
+  pretrained_pc_qformer: Null
+  pretrained_video_qformer: Null
+  pretrained_audio_qformer: Null
+  load_attention_image_qformer: False
+  load_attention_pc_qformer: False
+  load_attention_video_qformer: False
+  load_attention_audio_qformer: False
+  projection_only: True
+  projection_only_audio : True
+  projection_only_visual : True
+  projection_only_image : True
+  load_ln_type_image: ""
+  load_ln_type_video: ""
+  load_ln_type_pc: ""
+  load_ln_type_audio: ""
+  load_qformer_type_image: ""
+  load_qformer_type_pc: ""
+  load_qformer_type_video: ""
+  load_qformer_type_audio: ""
+  load_projection_image: False
+  load_projection_pc: False
+  load_projection_video: False
+  load_projection_audio: False
+  load_projection_type_image: ""
+  load_projection_type_pc: ""
+  load_projection_type_video: ""
+  load_projection_type_audio: ""
+  image_encoder_kwargs :  {"image_size": 224, "drop_path_rate": 0, "use_grad_checkpoint": False}
+  # pc_encoder_kwargs :  {}
+  video_encoder_kwargs :   {"image_size": 224, "drop_path_rate": 0, "use_grad_checkpoint": False}
+  audio_encoder_kwargs :  {"checkpoint_path": "pretrained/BEATs_iter3_plus_AS2M.pt"}
+  image_precision: "fp16"
+  pc_precision: "fp16"
+  video_precision: "fp16"
+  audio_precision: "fp16"
+  freeze_image: True
+  freeze_pc: True
+  freeze_video: True
+  freeze_audio: True
+  num_query_token: 32
+  # prompt:  "describe the image."
+  # max_txt_len: 128
+  max_txt_len: 512
+  max_output_txt_len: 256
+  apply_lemmatizer: False
+  num_few_shot_examples: 0
+  few_shot_prob: 0
+  qformer_text_input: True
+  llm_text_input: True
+  # modalities :  ["image"]
+  # modalities :  ["video"]
+  modalities :  ["audio", "video"]
+  use_cues: True
+  # use_cues: False
+  shared_qformer: False
+  pretrained_shared_qformer: ""
+  load_attention_shared_qformer: False
+  load_qformer_type_shared: ""
+  load_projection_shared: True
+  load_projection_type_shaped: ""
+  load_ln_type_shared: ""
+  shared_qformer_num_features: 512
+  prefix: ""
+  postfix: ""
+  predict_with_gen: False
+  lora: True
+  # int8: True
+
+processors:
+  audio_processor:
+    train:
+      name: beats_audio
+      sampling_rate: 11000
+      n_frames: 4
+    eval:
+      name: beats_audio
+      sampling_rate: 11000
+      n_frames: 4
+
+  img_processor:
+    train:
+      name: "clip_image_train"
+      image_size: 224
+    eval:
+      name: "clip_image_eval"
+      image_size: 224
+  
+  video_processor:
+    train:
+      name: alpro_video_train
+      n_frms: 4
+      image_size: 224
+      min_scale: 0.9
+      max_scale: 1.0
+      full_video: True
+    eval:
+      name: alpro_video_eval
+      n_frms: 4
+      image_size: 224
+      min_scale: 0.9
+      max_scale: 1.0
+      full_video: True
+  
+  text_processor:
+    train:
+      name: blip_instruction
+      task: caption
+      modality: image
+    eval:
+      name: blip_instruction
+      task: eval
+
+
+run:
+  runner: runner_iter
+  task: captioning
+  # optimizer
+  lr_sched: "linear_warmup_cosine_lr"
+  init_lr: 1e-5
+  min_lr: 0
+  warmup_lr: 1e-8
+  warmup_steps: 1000
+  weight_decay: 0.05
+  max_epoch: 50
+  batch_size_train: 4
+  batch_size_eval: 8
+  num_workers: 8
+  accum_grad_iters: 4
+  max_iters: 65000
+  iters_per_inner_epoch: 5000
+  report_metric: False
+  train_dataset_ratios: {"msrvtt_caption_instruct": 1., "msrvtt_qa_instruct": 0.17864922797406588 , "webvid2m_caption_instruct": 0.6543554630478173}
+
+  max_len: 80
+  min_len: 1
+  num_beams: 5
+
+  seed: 42
+  output_dir: "output/xinstructblip/train/vicuna7b/image"
+  amp: True
+  resume_ckpt_path: null
+
+  evaluate: False
+  train_splits: ["train"]
+  valid_splits: ["val"]
+
+
+  device: "cuda"
+  world_size: 1
+  dist_url: "env://"
+  distributed: True
+  save_freq: 1 # save epoch every xxx epochs -1 only save last and best. 
+  val_freq: 1
+
+
+
