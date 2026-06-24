@@ -17,13 +17,13 @@ class flickr30kLoader(Dataset):
     def __init__(self, processors_cfg, mode='train'):
         self.mode = mode
 
-        flickr30k_data_root = '/mnt/data0/wpian/dataset/flickr30k'
+        flickr30k_data_root = './dataset/flickr30k'
 
         self.img_root = os.path.join(flickr30k_data_root, 'flickr30k-images')
         # self.all_imgs = h5py.File(os.path.join(flickr30k_data_root, 'imgs.h5'), 'r')
 
         # img_id_caption_dict_path = os.path.join(flickr30k_data_root, 'all_img_id_caption_dict.npy')
-        img_id_caption_dict_path = './dataset/all_img_id_caption_dict.npy'
+        img_id_caption_dict_path = './data/all_img_id_caption_dict.npy'
         self.img_id_caption_dict = np.load(img_id_caption_dict_path, allow_pickle=True).item()
 
         # processors_cfg = config.get('processors')
@@ -77,77 +77,7 @@ class flickr30kLoader(Dataset):
     def __len__(self):
         # return len(self.flickr30k)
         return len(self.img_id_list)
-    
-
-class flickr30kLoader4pseudoQA(Dataset):
-    def __init__(self, processors_cfg, mode='train'):
-        self.mode = mode
-
-        # self.flickr30k = load_dataset("flickr30k")
-
-        flickr30k_data_root = '/project/home/p200686/dataset/flickr30k'
-
-        self.img_root = os.path.join(flickr30k_data_root, 'flickr30k-images')
-        # self.all_imgs = h5py.File(os.path.join(flickr30k_data_root, 'imgs.h5'), 'r')
-
-        img_id_caption_dict_path = './dataset/all_img_id_caption_dict.npy'
-        self.img_id_caption_dict = np.load(img_id_caption_dict_path, allow_pickle=True).item()
-
-        # processors_cfg = config.get('processors')
-
-        if self.mode == 'train':
-            # self.flickr30k = self.flickr30k["train"]
-            self.img_id_caption_dict = self.img_id_caption_dict['train']
-            img_processor_cfg = processors_cfg.get('img_processor').get('train')
-            txt_processor_cfg = processors_cfg.get('text_processor').get('train')
-        elif self.mode == 'val':
-            # self.flickr30k = self.flickr30k["test"]
-            self.img_id_caption_dict = self.img_id_caption_dict['val']
-            img_processor_cfg = processors_cfg.get('img_processor').get('eval')
-            txt_processor_cfg = processors_cfg.get('text_processor').get('eval')
-        elif self.mode == 'test':
-            # self.flickr30k = self.flickr30k["test"]
-            self.img_id_caption_dict = self.img_id_caption_dict['test']
-            img_processor_cfg = processors_cfg.get('img_processor').get('eval')
-            txt_processor_cfg = processors_cfg.get('text_processor').get('eval')
-        else:
-            raise ValueError('mode must be \'train\', \'val\' or \'test\'')
-        
-        self.img_id_list = list(self.img_id_caption_dict.keys())
-
-        self.img_processor = registry.get_processor_class(img_processor_cfg.get('name')).from_config(img_processor_cfg)
-        self.txt_processor = registry.get_processor_class(txt_processor_cfg.get('name')).from_config(txt_processor_cfg)
-        
-        if self.mode == 'train':
-            self.txt_processor.task = 'caption'
-        else:
-            self.txt_processor.task = 'eval'
-        self.txt_processor.prompt = 'describe the image.'
-        self.txt_processor.modality = 'image'
-
-    
-    def __getitem__(self, index):
-        img_id = self.img_id_list[index]
-
-        # img_path = os.path.join(self.img_root, img_id + '.jpg')
-        # img_input = Image.open(img_path).convert('RGB')
-
-        # img_input = self.img_processor(img_input)
-        # txt_input = 'describe the image.'
-        txt_input = self.txt_processor("")
-
-        txt_output = self.img_id_caption_dict[img_id]
-        txt_output = self.txt_processor(txt_output)
-
-        # return str(img_id), img_input, txt_input, txt_output
-        return str(img_id), txt_input, txt_output
-
-    def __len__(self):
-        # return len(self.flickr30k)
-        return len(self.img_id_list)
-
-
-
+ 
 
 class OKVQALoader(Dataset):
     def __init__(self, processors_cfg, mode='train'):
@@ -156,9 +86,9 @@ class OKVQALoader(Dataset):
         if mode not in ['train', 'val', 'test']:
             raise ValueError('mode must be \'train\', \'val\' or \'test\'')
 
-        OKVQA_data_root = '/mnt/data0/wpian/dataset/coco/OK-VQA'
+        OKVQA_data_root = './dataset/coco/OK-VQA'
 
-        anno_path = './dataset/question_id_img_id_quesion_answer_dict.npy'
+        anno_path = './data/question_id_img_id_quesion_answer_dict.npy'
         self.question_id_dict = np.load(anno_path, allow_pickle=True).item()
 
         # processors_cfg = config.get('processors')
@@ -229,12 +159,12 @@ class MSRVTTLoader(Dataset):
     def __init__(self, processors_cfg, mode='train'):
         self.mode = mode
 
-        msrvtt_data_root = '/mnt/data0/wpian/dataset/MSRVTT'
+        msrvtt_data_root = './dataset/MSRVTT'
 
         self.video_root = os.path.join(msrvtt_data_root, 'videos', 'all')
         # self.audio_root = os.path.join(msrvtt_data_root, 'audios')
 
-        vid_caption_dict_path = './dataset/all_vid_caption_dict.npy'
+        vid_caption_dict_path = './data/all_vid_caption_dict.npy'
         # vid_caption_dict_path = os.path.join(msrvtt_data_root, 'all_avid_caption_dict.npy')
         self.vid_caption_dict = np.load(vid_caption_dict_path, allow_pickle=True).item()
 
@@ -308,13 +238,13 @@ class AudioCapsLoader(Dataset):
     def __init__(self, processors_cfg, mode='train'):
         self.mode = mode
 
-        audiocaps_data_root = '/mnt/data0/wpian/dataset/AudioCaps'
+        audiocaps_data_root = './dataset/AudioCaps'
 
         self.audio_root = os.path.join(audiocaps_data_root, 'all_audios')
         # self.audio_root = os.path.join(audiocaps_data_root, 'all_audios_new')
         # print('audio_root: {}'.format(self.audio_root))
 
-        aid_caption_dict_path = './dataset/all_audio_id_cap_dict.npy'
+        aid_caption_dict_path = './data/all_audio_id_cap_dict.npy'
         self.aid_caption_dict = np.load(aid_caption_dict_path, allow_pickle=True).item()
 
         if self.mode == 'train':
@@ -373,11 +303,11 @@ class ClothoAQALoader(Dataset):
     def __init__(self, processors_cfg, mode='train'):
         self.mode = mode
 
-        clotho_data_root = '/mnt/data0/wpian/dataset/Clotho-AQA'
+        clotho_data_root = './dataset/Clotho-AQA'
 
         self.audio_root = os.path.join(clotho_data_root, 'audio_files')
 
-        anno_path = './dataset/question_id_audio_id_quesion_answer_dict.npy'
+        anno_path = './data/question_id_audio_id_quesion_answer_dict.npy'
         self.question_id_dict = np.load(anno_path, allow_pickle=True).item()
 
         self.question_id_dict = self.question_id_dict[mode]
@@ -441,11 +371,11 @@ class MSVDQALoader(Dataset):
     def __init__(self, processors_cfg, mode='train'):
         self.mode = mode
 
-        MSVD_data_root = '/mnt/data0/wpian/dataset/MSVD/MSVD-QA'
+        MSVD_data_root = './dataset/MSVD/MSVD-QA'
 
         self.video_root = os.path.join(MSVD_data_root, 'video')
 
-        anno_path = './dataset/question_id_video_id_quesion_answer_dict.npy'
+        anno_path = './data/question_id_video_id_quesion_answer_dict.npy'
         self.question_id_dict = np.load(anno_path, allow_pickle=True).item()
 
         self.question_id_dict = self.question_id_dict[mode]
