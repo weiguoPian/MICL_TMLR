@@ -10,18 +10,7 @@
   </p>
 </div>
 
-<!-- This repository runs multimodal continual learning experiments over six tasks. Two task orders are provided:
-
-- [`run_order_1.sh`](run_order_1.sh)
-- [`run_order_2.sh`](run_order_2.sh)
-
-Each script contains one commented command block per training step. The blocks are intentionally disabled so that a run executes exactly one step at a time and uses the checkpoint produced by the previous step. -->
-
-<!-- ## Before running
-
-Run commands from the repository root. Configure the paths to the datasets, pretrained models, and any required checkpoints for your environment before launching training. The default experiment configuration is [`config_llama_3.2_only_proj.yaml`](config_llama_3.2_only_proj.yaml); its `llm_model` field defaults to `meta-llama/Llama-3.2-1B-Instruct`.
-
-The launcher commands use `CUDA_VISIBLE_DEVICES=0` and `nohup`. Change the GPU index, remove `nohup`, or adjust log-file paths as needed. -->
+This repository contains the official implementation of [*Modality-Inconsistent Continual Learning of Multimodal Large Language Models*](https://openreview.net/pdf?id=FD8or43fBU). It studies continual learning for multimodal large language models under sequential tasks with changing modalities and task types, and provides training code for image, video, and audio captioning and question-answering benchmarks.
 
 # Data Preparation
 
